@@ -15,8 +15,8 @@ class Morpher:
         self.mesh1 = mesh1
         self.mesh2 = mesh2
         self.merged_meshes = merge(mesh1, mesh2)
-        self.mesh1.lw(4).c('grey3').pickable(False)
-        self.mesh2.lw(4).c('grey1').pickable(False)
+        self.mesh1.lw(1).c('green').pickable(False)
+        self.mesh2.lw(1).c('blue').pickable(False)
 
         self.arrow_starts = []
         self.arrow_stops  = []
@@ -116,7 +116,7 @@ class Morpher:
             T = warped_plane.transform
 
             mw = self.mesh1.clone().apply_transform(T).c('red4')
-
+            self._mw = mw
             a = Points(self.arrow_starts, r=10).apply_transform(T)
             b = Points(self.arrow_stops,  r=10).apply_transform(T)
 
@@ -160,7 +160,8 @@ class Morpher:
             self.plotter.add(self.plane1, self.msg1, self.mesh1, self.mesh2)
             self.plotter.at(1).clear().add_renderer_frame()
             self.plotter.add(self.plane2, self.msg2).render()
-
+        elif evt.keypress == "q": 
+            self.plotter.close()
 
 ######################################################################################## MAIN
 if __name__ == "__main__":
