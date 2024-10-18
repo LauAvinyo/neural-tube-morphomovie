@@ -36,8 +36,6 @@ for a, b in ((0, 3), (3, 5)):
         vis.append(mesh)
         mesh_id  += 1
 
-#         except:
-#             pass
 
 plt = Browser(vis)
 plt.show()

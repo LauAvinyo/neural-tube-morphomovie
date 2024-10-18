@@ -2,7 +2,7 @@ from vedo.applications import Browser, SplinePlotter
 from vedo import Mesh, Image, show, printc
 import os
 import sys
-from morpher import Morpher
+from vedo.applications import MorphPlotter
 
 vis = []
 
@@ -40,12 +40,14 @@ if os.path.exists(lineout):
     # sys.exit()
 else:
     # Align it with each of the contour. 
-    plt = SplinePlotter(pic)
+    plt = SplinePlotter(pic, closed=True)
     plt.show(mode="image", zoom='tightest')
     spline = plt.line.scale(0.01)
     plt.close()
 
-# printc("Staging...", c="green")
+
+# STAGING SYSTEM
+printc("Staging...", c="green")
 # differences = []
 # for k in course:
 #     c_spline = spline.clone()
@@ -55,42 +57,40 @@ else:
 
 # differences = sorted(differences)
 # d, k = differences[0]
-d, k = 0, 9
+d, k = 0, 14
+print(d, k)
+
 spline.align_to(course[k])
+
+
 print(f"{k} with distance {d}")
-# show(
-#     spline, 
-#     pic.apply_transform(spline.transform), 
-#     course[k]
-# )
-
-# Map the gene expression
-pic_mesh = pic.tomesh()
-pic_mesh.apply_transform(spline.transform)
-
-printc("Cutting using outline... (please wait)", c="g6")
-cut_msh = pic_mesh.clone().cut_with_point_loop(spline)
-cut_msh.pointdata.select("RGBA")
-cut_msh.add_scalarbar3d("Expression level")
-cut_msh.smooth().decimate(0.1).smooth()
-# exit()
-
-# msh = spline.generate_mesh().smooth()
-# msh.interpolate_data_from(cut_msh, n=3, exclude=["Normals", "TextureCoordinates", "Selection"])
-# cut_msh.celldata.select("RGBA")
-# msh.cmap("viridis_r").add_scalarbar3d("Expression level")
-# show(msh, spline)
-# exit()
-# cut_msh.map_points_to_cells()
+spline_mesh = spline.generate_mesh(invert=True) # TO D_2D...
 
 
 
 
-# # Wrap
-morpher = Morpher(cut_msh, course[k], 0)
-morpher.start()
-show(morpher._mw, course[k])
-morpher._mw.write("map.vtk")
-# plt = Browser(vis)
-# plt.show()
-# plt.close()
+
+
+# Wrap
+morpher = MorphPlotter(spline.lw(10), course[k])
+morpher.show()
+T = morpher.warped.transform
+pic_mesh = pic.bw().tomesh().apply_transform(spline.transform)
+pic_mesh.apply_transform(T)
+
+# Interpolaion 
+mm_mesh_path = os.path.join("meshes", f"{k}.vtk")
+mesh = Mesh(mm_mesh_path)
+mesh.interpolate_data_from(pic_mesh, n=1)
+mesh.pointdata.select("RGBA")
+mesh.cmap("Greens")
+
+
+print(morpher.warped)
+show(
+    mesh.cmap("Greens")
+)
+
+
+mesh.write(filename.replace(".png", ".vtk"))
+

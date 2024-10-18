@@ -30,13 +30,16 @@ class Morpher:
 
         sz = self.merged_meshes.diagonal_size()
         self.plane1 = Grid(s=[sz,sz], res=[50, 50]).pos(self.merged_meshes.center_of_mass())
-        self.plane1.wireframe(False).alpha(1).linewidth(0.1).c('white').lc('grey5')
-        self.plane2 = self.plane1.clone().pickable(False)
+        self.plane1.wireframe(False).alpha(0.2).linewidth(0.1).c('white').lc('grey5')
 
+        self.plane2 = self.plane1.clone().pickable(False)
+        
         self.plotter = Plotter(N=2, bg='light blue', size=(2000,1000), sharecam=0)
         self.plotter.add_callback('left click', self.onleftclick)
         self.plotter.add_callback('right click', self.onrightclick)
         self.plotter.add_callback('key press', self.onkeypress)
+
+        self.T = None
     
     def save_points(self, filepath):
         """Save the arrow start and stop points to a file using pickle."""
@@ -58,11 +61,12 @@ class Morpher:
         # Optionally redraw the arrows after loading
         self.draw(True)
         self.draw(False)
+    
     def start(self):  ################################################ show stuff
         paxes = Axes(self.plane1, xygrid=0, text_scale=0.6)
         self.plotter.at(0).show(self.plane1, paxes, self.msg1, self.mesh1, self.mesh2)
         self.plotter.at(1).show(self.plane2, self.msg2, mode='image')
-        if len(self.arrow_starts)>0:
+        if len(self.arrow_starts) > 0:
             self.draw(True)
             self.draw(False)
             self.msg1.text(self.instructions)
@@ -113,9 +117,9 @@ class Morpher:
             warped_plane = self.plane1.clone().pickable(False)
             warped_plane.warp(self.arrow_starts, self.arrow_stops, mode=self.mode)
             T = warped_plane.transform
-
-            mw = self.mesh1.clone().apply_transform(T).c('red4')
-            self._mw = mw
+            self.T = T
+            # mw = self.mesh1.clone().apply_transform(T).c('red4')
+            # self._mw = mw
             a = Points(self.arrow_starts, r=10).apply_transform(T)
             b = Points(self.arrow_stops,  r=10).apply_transform(T)
 
