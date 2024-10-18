@@ -11,7 +11,8 @@ vis = []
 #         vis.append(msh)
 cmap = "RdYlBu"
 
-plt = Plotter()
+# plt = Plotter()
+mesh_id = 0
 for a, b in ((0, 3), (3, 5)):
     for r in range(11):
         p = os.path.join("intermidiates-b", f"{a}-{b}-{r}.vtk")
@@ -30,7 +31,10 @@ for a, b in ((0, 3), (3, 5)):
         # plt.show()
         # plt.screenshot(f"{a}-{b}-{r}.png")
         # plt -= mesh
+        mesh_path = os.path.join("meshes", f"{mesh_id}.vtk")
+        mesh.write(mesh_path)
         vis.append(mesh)
+        mesh_id  += 1
 
 #         except:
 #             pass
